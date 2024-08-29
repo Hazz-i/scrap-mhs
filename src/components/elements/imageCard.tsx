@@ -1,15 +1,15 @@
 import { Card } from "../ui/card";
+import * as React from "react";
 
 type imageCardProps = {
 	img_url: string;
-	key: number;
 };
 
 const ImageCard = (props: imageCardProps) => {
 	return (
-		<div className="relative group">
+		<button className="relative group">
 			<Card
-				className="w-[130px] h-[175px] lg:w-[150px] lg:h-[200px] transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:cursor-pointer bg-cover bg-center"
+				className="w-[130px] h-[175px] lg:w-[150px] lg:h-[200px] transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:cursor-pointer bg-cover bg-center overflow-hidden"
 				style={{
 					backgroundImage: `url(${props.img_url})`,
 				}}>
@@ -21,7 +21,7 @@ const ImageCard = (props: imageCardProps) => {
 					</ul>
 				</div>
 			</Card>
-		</div>
+		</button>
 	);
 };
 

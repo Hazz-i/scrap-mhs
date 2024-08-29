@@ -7,32 +7,58 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
+import * as React from "react";
 
-const PaginationElement = () => {
+type paginationProps = {
+	items: number;
+};
+
+const PaginationElement = (props: paginationProps) => {
 	return (
 		<Pagination>
-			<PaginationContent>
-				<PaginationItem>
-					<PaginationPrevious href="#" />
-				</PaginationItem>
-				<PaginationItem>
-					<PaginationLink href="#">1</PaginationLink>
-				</PaginationItem>
-				<PaginationItem>
-					<PaginationLink href="#" isActive>
-						2
-					</PaginationLink>
-				</PaginationItem>
-				<PaginationItem>
-					<PaginationLink href="#">3</PaginationLink>
-				</PaginationItem>
-				<PaginationItem>
-					<PaginationEllipsis />
-				</PaginationItem>
-				<PaginationItem>
-					<PaginationNext href="#" />
-				</PaginationItem>
-			</PaginationContent>
+			{props.items > 0 && (
+				<PaginationContent>
+					{/* Pagination Previous */}
+					<PaginationItem>
+						<PaginationPrevious href="#" />
+					</PaginationItem>
+
+					{/* Pagination Items */}
+					{Array.from({ length: props.items }, (_, index) => {
+						const isEllipsisBefore = index === 3;
+						const isEllipsisAfter = index === props.items - 2;
+
+						return (
+							<React.Fragment key={index}>
+								{/* Insert Ellipsis before */}
+								{isEllipsisBefore && (
+									<PaginationItem>
+										<PaginationEllipsis />
+									</PaginationItem>
+								)}
+
+								<PaginationItem>
+									<PaginationLink href="#" isActive={index === 1}>
+										{index + 1}
+									</PaginationLink>
+								</PaginationItem>
+
+								{/* Insert Ellipsis after */}
+								{isEllipsisAfter && (
+									<PaginationItem>
+										<PaginationEllipsis />
+									</PaginationItem>
+								)}
+							</React.Fragment>
+						);
+					})}
+
+					{/* Pagination Next */}
+					<PaginationItem>
+						<PaginationNext href="#" />
+					</PaginationItem>
+				</PaginationContent>
+			)}
 		</Pagination>
 	);
 };

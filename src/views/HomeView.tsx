@@ -1,13 +1,15 @@
 import * as React from "react";
 import DropdownAngkatan from "@/components/elements/dropdowns/dropdownAngkatan";
 import DropdownFakultas from "@/components/elements/dropdowns/dropdownFakultas";
-import PaginationElement from "@/components/elements/paginationElement";
 import prodi from "@/components/prodi";
 import { Input } from "@/components/ui/input";
 import Modal from "@/components/elements/modals/modal";
 import ModalWarning from "@/components/elements/modals/modalWarning";
 import axiosClient from "@/config/axios";
 import ImageCard from "@/components/elements/imageCard";
+import ImagePropover from "@/components/elements/imagePropover";
+import { ModeToggle } from "@/components/toogleDarkMode";
+import ImageShet from "@/components/elements/imageShet";
 
 const HomeViews = () => {
 	const [nimStart, setNimStart] = React.useState<any>();
@@ -22,8 +24,10 @@ const HomeViews = () => {
 
 	const [isValue, setIsValue] = React.useState<string>("");
 	const [fakultas, setFakultas] = React.useState<string>("");
+
 	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 	const [isClear, setIsClear] = React.useState<boolean>(false);
+
 	const [allUrls, setAllurls] = React.useState<string[]>([]);
 
 	React.useEffect(() => {
@@ -54,7 +58,9 @@ const HomeViews = () => {
 	return (
 		<>
 			<span className="flex flex-col gap-10 text-center w-full items-center justify-center">
-				<h1 className="font-bold text-4xl">Cari Foto Mahasiswa</h1>
+				<h1 className="font-bold text-4xl flex items-center justify-center gap-5">
+					Cari Foto Mahasiswa <ModeToggle />
+				</h1>
 				<span className="grid gap-5">
 					<div className="flex w-full items-end space-x-2 justify-center">
 						<Input type="text" className="max-w-lg" readOnly value={isValue} />
@@ -66,7 +72,11 @@ const HomeViews = () => {
 						/>
 					</div>
 					<div className="flex w-full items-end space-x-2 justify-center">
-						<DropdownAngkatan title="Angkatan" value={yearsArray} setIsValue={setAngkatan} />
+						<DropdownAngkatan
+							title="Angkatan"
+							value={yearsArray.reverse()}
+							setIsValue={setAngkatan}
+						/>
 						<DropdownFakultas title="Prodi" value={prodi} setIsValue={setKodeProdi} />
 						<Input
 							type="number"
@@ -85,6 +95,22 @@ const HomeViews = () => {
 					</div>
 				</span>
 			</span>
+
+			<div className="col-span-8 text-center text-2xl font-semibold border w-[90vw] bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center min-h-[63vh] p-5">
+				{isLoading ? (
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 dark:border-gray-100"></div>
+				) : allUrls.length === 0 ? (
+					<h1>Data tidak ditemukan</h1>
+				) : (
+					<div className="flex flex-wrap w-full gap-5 items-center justify-center">
+						{allUrls?.map((url: string, index: number) => (
+							<ImageShet key={index} img_url={url} />
+						))}
+					</div>
+				)}
+			</div>
+			{/* <PaginationElement items={50} /> */}
+
 			{isClear && (
 				<ModalWarning
 					isOpen={isClear}
@@ -93,21 +119,6 @@ const HomeViews = () => {
 					description="NIM tidak boleh kosong"
 				/>
 			)}
-
-			<div className="col-span-8 text-center text-2xl font-semibold border w-[90vw] bg-gray-100 rounded-lg flex items-center justify-center min-h-[63vh] p-5">
-				{isLoading ? (
-					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-				) : allUrls.length === 0 ? (
-					<h1>Data tidak ditemukan</h1>
-				) : (
-					<div className="flex flex-wrap w-full gap-5 items-center justify-center">
-						{allUrls?.map((url: string, index: number) => (
-							<ImageCard key={index} img_url={url} />
-						))}
-					</div>
-				)}
-			</div>
-			<PaginationElement />
 		</>
 	);
 };
