@@ -1,16 +1,15 @@
-from dotenv import load_dotenv
 import requests
-import os
+import logging
 
-# Load environment variables from .env file
-load_dotenv()
+def download_single_image(url, filename):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
 
-req = os.getenv('API_REQ')
-url = f"{req}/2022/22_11_4880.jpg"
-
-response = requests.get(url)
-
-image_data = response.content
-with open('downloaded_image.jpg', 'wb') as file:
-    file.write(image_data)
-print("Gambar berhasil disimpan sebagai downloaded_image.jpg")
+        # Save the image to a file
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+        logging.info(f"Image successfully downloaded and saved as {filename}.")
+    
+    except Exception as e:
+        logging.error(f"Failed to download image from {url}: {e}")

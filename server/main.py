@@ -1,9 +1,13 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, send_file
 from dotenv import load_dotenv
 from flask_cors import CORS
+import requests
 import os
+import io
+from zipfile import ZipFile
 
 from image.showImage import get_all_image 
+from image.downloadImage import download_single_image 
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,44 +24,69 @@ def get_img_url(angkatan, fakultas, nim):
         req = os.getenv('API_REQ')
         result = []
 
-        while int(start) <= int(end): 
-            url = f"{req}/{angkatan}/{nim_angkatan}_{fakultas}_{start}.jpg"
-            print(f"Processing NIM: {start} - URL: {url}") 
+        nim_length = len(start)
+
+        while int(start) <= int(end):
+            formatted_start = str(start).zfill(nim_length)
+            url = f"{req}/{angkatan}/{nim_angkatan}_{fakultas}_{formatted_start}.jpg"
+            print(f"Processing NIM: {formatted_start} - URL: {url}")
 
             data = get_all_image(url)
             if data:
                 result.extend(data)
             else:
-                print(f"No image found for NIM: {start}") 
+                print(f"No image found for NIM: {formatted_start}")
 
-            start = str(int(start) + 1) 
+            start = str(int(start) + 1).zfill(nim_length)  
 
         return jsonify({'status': "success", 'data': result})
 
     except Exception as e:
         return jsonify({'status': "fail", 'message': str(e)}), 500
 
-# @app.route('/api/neko-stream/search=<anime>', methods=['GET'])
-# def search(anime):
-#     try:
-#         animeSearch = anime.replace(" ", "+")
-#         if not anime:
-#             return jsonify({'success': "fail", 'message': "Invalid parameters."}), 400
 
-#         url = f"https://otakudesu.cloud/?s={animeSearch}&post_type=anime"
-#         data = scrape_search_anime(url)
+@app.route('/image/download-image', methods=['POST'])
+def download_single_image(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content
+    else:
+        raise Exception(f"Failed to download image from {url}")
+
+@app.route('/image/download_zip_from_urls', methods=['POST'])
+def download_zip_from_urls():
+    try:
+        data = request.json 
+        urls = data.get('urls', [])
+
+        if not urls:
+            return jsonify({'status': "fail", 'message': "No URLs provided"}), 400
+
+        # Membuat file ZIP secara in-memory
+        zip_buffer = io.BytesIO()
+        with ZipFile(zip_buffer, 'w') as zip_file:
+            for index, url in enumerate(urls):
+                filename = f"image_{index + 1}.jpg"
+                
+                try:
+                    # Unduh gambar dan tambahkan ke dalam file ZIP
+                    img_data = download_single_image(url)
+                    zip_file.writestr(filename, img_data)
+                except Exception as e:
+                    print(f"Failed to download {url}: {str(e)}")
         
-#         if data:
-#             results = []
-#             results.extend(data)
-            
-#             return jsonify({'success': "success", 'data': results})
-#         else:
-#             return jsonify({'success': "fail", 'message': "No data was scraped."}), 404
+        # Memindahkan pointer ke awal buffer
+        zip_buffer.seek(0)
 
-#     except Exception as e:
-#         logging.error(f"An error occurred: {e}")
-#         return jsonify({'success': "fail", 'message': "An error occurred.", 'error': str(e)}), 500
+        return send_file(
+            zip_buffer,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name='images.zip'
+        )
+
+    except Exception as e:
+        return jsonify({'status': "fail", 'message': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host=os.getenv('FLASK_RUN_HOST'), port=os.gotenv('FLASK_RUN_PORT'))
+    app.run(host=os.getenv('FLASK_RUN_HOST'), port=os.getenv('FLASK_RUN_PORT'))

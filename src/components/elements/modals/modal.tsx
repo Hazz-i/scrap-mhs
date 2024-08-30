@@ -16,13 +16,16 @@ type AlertDialogProps = {
 	dialogTitle: string;
 	description: string;
 	handleConfirm: () => void;
+	isLoading: boolean;
 };
 
 const Modal = (props: AlertDialogProps) => {
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
-				<Button>{props.title}</Button>
+				<Button className="w-full lg:w-auto" disabled={props.isLoading}>
+					{props.title}
+				</Button>
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
@@ -30,8 +33,8 @@ const Modal = (props: AlertDialogProps) => {
 					<AlertDialogDescription>{props.description}</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction onClick={props.handleConfirm}>Continue</AlertDialogAction>
+					<AlertDialogCancel>Batalkan</AlertDialogCancel>
+					<AlertDialogAction onClick={props.handleConfirm}>Mengerti</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

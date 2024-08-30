@@ -1,9 +1,6 @@
-from dotenv import load_dotenv
 import requests
 import logging
 
-# Load environment variables from .env file
-load_dotenv()
 
 def get_all_image(url):
     try:

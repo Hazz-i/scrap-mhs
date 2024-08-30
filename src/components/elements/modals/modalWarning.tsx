@@ -25,7 +25,7 @@ const ModalWarning = (props: AlertDialogProps) => {
 					<AlertDialogDescription>{props.description}</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogAction>Continue</AlertDialogAction>
+					<AlertDialogAction>Mengerti!</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
